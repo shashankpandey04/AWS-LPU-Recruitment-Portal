@@ -1,0 +1,8 @@
+Flask
+Flask-Login
+gspread
+oauth2client
+pymongo
+bcrypt
+python-dotenv
+waitress
