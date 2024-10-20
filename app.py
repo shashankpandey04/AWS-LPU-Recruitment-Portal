@@ -14,7 +14,9 @@ import waitress
 dotenv.load_dotenv()
 
 scope = ['https://spreadsheets.google.com/feeds', 'https://www.googleapis.com/auth/drive']
-creds = ServiceAccountCredentials.from_json_keyfile_name('credentials.json', scope)
+credentials_json = os.getenv('CREDENTIALS_JSON')
+credentials_dict = json.loads(credentials_json)
+creds = ServiceAccountCredentials.from_json_keyfile_dict(credentials_dict, scope)
 client = gspread.authorize(creds)
 
 SHEET_ID = os.getenv('SHEET_ID')
