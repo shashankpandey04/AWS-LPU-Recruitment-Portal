@@ -11,7 +11,6 @@
         <table class="table table-striped">
             <thead>
                 <tr>
-                    <th>Registration Number</th>
                     <th>Name</th>
                     <th>Role Applied</th>
                     <th>Status</th>
@@ -20,7 +19,6 @@
             <tbody>
                 {% for app in applications %}
                 <tr>
-                    <td>{{ app.reg_no }}</td>
                     <td>{{ app.name }}</td>
                     <td>{{ app.role_applied }}</td>
                     <td>{{ app.status }}</td>
