@@ -152,9 +152,7 @@ def apply():
                     'password': hashed_password,
                     'admin': False
                 })
-                print('Application inserted into MongoDB')
             except Exception as e:
-                print('Error inserting into MongoDB:', e)
                 flash(f'Error submitting the form: {e}', 'error')
             sheet.append_row(data)
             flash('Your application has been submitted successfully!', 'success')
@@ -173,33 +171,26 @@ def login():
         reg_no = request.form.get('reg_no')
         password = request.form.get('password')
 
-        print(f"Received login request: reg_no={reg_no}, password={'***' if password else None}")
-
         if not reg_no or not password:
-            print("Missing registration number or password")
             flash('All fields are required', 'error')
             return redirect(url_for('login'))
 
         try:
             user = db.applications.find_one({'reg_no': str(reg_no)})
             if not user:
-                print(f"User not found for reg_no={reg_no}")
                 flash('Invalid credentials', 'error')
                 return redirect(url_for('login'))
 
             if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-                print(f"Password match for user {reg_no}")
                 user_obj = User(user['reg_no'], user['name'], user['email'], user['status'], user.get('admin', False))
                 login_user(user_obj)
                 flash('Login successful!', 'success')
                 return redirect(url_for('dashboard'))
             else:
-                print(f"Incorrect password for user {reg_no}")
                 flash('Invalid credentials', 'error')
                 return redirect(url_for('login'))
 
         except Exception as e:
-            print(f"Error during login: {e}")
             flash(f'Error logging in: {e}', 'error')
             return redirect(url_for('login'))
     else:
