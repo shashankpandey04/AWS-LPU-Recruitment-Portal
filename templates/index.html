@@ -1,0 +1,23 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1 class="display-4">Welcome to AWS Cloud Club LPU</h1>
+    <p class="lead">We are a group of students who are passionate about AWS<br> and ready to learn and share our knowledge with others.</p>
+    <hr class="my-4">
+
+    <!--Hiring now -->
+    <h2 class="text-center">We are hiring!</h2>
+    <p class="text-center">We are looking for passionate students who are interested in AWS. If you are interested, please <a href="/apply">apply here</a>.</p>
+    <hr class="my-4">
+    
+    <!--Login if already registered -->
+    <h2 class="text-center">Already registered?</h2>
+    <p class="text-center">If you have already applied, please <a href="/login">login here</a>.</p>
+</div>
+
+{% endblock %}

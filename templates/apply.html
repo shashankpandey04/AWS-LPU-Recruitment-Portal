@@ -1,0 +1,161 @@
+
+{% extends 'base.html' %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+        <div class="form-container">
+            <h2 class="text-center">Join AWS Cloud Club LPU</h2>
+            <form method="POST" action="{{ url_for('apply') }}">
+
+                <div class="form-group">
+                    <label for="name">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="gender">Gender</label>
+                    <select class="form-control" id="gender" name="gender" required>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="reg_no">Registration Number</label>
+                    <input type="text" class="form-control" id="reg_no" name="reg_no" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="mobile_no">Mobile Number</label>
+                    <input type="tel" class="form-control" id="mobile_no" name="mobile_no" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="stream">Stream (e.g., BTech CSE)</label>
+                    <input type="text" class="form-control" id="stream" name="stream" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="year_of_study">Year of Study</label>
+                    <select class="form-control" id="year_of_study" name="year_of_study" required>
+                        <option>Select Here</option>
+                        <option>1st Year</option>
+                        <option>2nd Year</option>
+                        <option>3rd Year</option>
+                        <option>4th Year</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="role_applied">Role Applied</label>
+                    <select class="form-control" id="role_applied" name="role_applied" required>
+                        <option>Select Here</option>
+                        <option>Technical: Web Dev</option>
+                        <option>Technical: App Dev</option>
+                        <option>Cybersecurity</option>
+                        <option>Data Science</option>
+                        <option>Cloud Architect</option>
+                        <option>Technical: UI/UX</option>
+                        <option>Content Writing</option>
+                        <option>Graphic Design</option>
+                        <option>Social Media Handling</option>
+                        <option>Technical Blogger</option>
+                        <option>Photography</option>
+                        <option>Public Speaker</option>
+                        <option>Event Coordinator</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="rate_yourself">Rate your expertise in the chosen role (1-5)</label>
+                    <select class="form-control" id="rate_yourself" name="rate_yourself" required>
+                        <option>Select Here</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="other_organization">Associated with any other club or organization?</label>
+                    <input type="text" class="form-control" id="other_organization" name="other_organization" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience">Share your experience and challenges in your role (if any):</label>
+                    <textarea class="form-control" id="experience" name="experience" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="dedication">Time you can dedicate (1-5)</label>
+                    <select class="form-control" id="dedication" name="dedication" required>
+                        <option>Select Here</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="why_interested">Why are you interested in this role?</label>
+                    <textarea class="form-control" id="why_interested" name="why_interested" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="contribution">How will you contribute to the organization?</label>
+                    <textarea class="form-control" id="contribution" name="contribution" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="how_did_you_know">How did you know about this opportunity?</label>
+                    <input type="text" class="form-control" id="how_did_you_know" name="how_did_you_know">
+                </div>
+
+                <div class="form-group">
+                    <label for="aws_account">Do you have an AWS Educate or AWS Free Tier account?</label>
+                    <select class="form-control" id="aws_account" name="aws_account">
+                        <option>Select Here</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="links">External Links (LinkedIn, GitHub, etc.)</label>
+                    <textarea class="form-control" id="links" name="links" rows="4"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="used_aws">Have you used AWS before?</label>
+                    <select class="form-control" id="used_aws" name="used_aws">
+                        <option>Select Here</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="acknowledge" name="acknowledge" required>
+                    <label class="form-check-label" for="acknowledge">I acknowledge that the information provided is accurate and true.</label>
+                </div>
+
+                <button type="submit" class="btn btn-primary mt-4">Submit Application</button>
+            </form>
+        </div>
+{% endblock %}

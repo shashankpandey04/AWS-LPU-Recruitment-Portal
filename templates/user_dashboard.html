@@ -1,0 +1,32 @@
+
+{% extends 'base.html' %}
+
+{% block title %} User Dashboard {% endblock %}
+
+{% block content %}
+        <h2>Welcome, {{ current_user.name }}</h2>
+        <h4>Your Application Status</h4>
+        <table class="table table-striped">
+            <tr>
+                <th>Registration Number</th>
+                <td>{{ application.reg_no }}</td>
+            </tr>
+            <tr>
+                <th>Name</th>
+                <td>{{ application.name }}</td>
+            </tr>
+            <tr>
+                <th>Email</th>
+                <td>{{ application.email }}</td>
+            </tr>
+            <tr>
+                <th>Role Applied</th>
+                <td>{{ application.role_applied }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>{{ application.status }}</td>
+            </tr>
+        </table>
+    
+{% endblock %}
