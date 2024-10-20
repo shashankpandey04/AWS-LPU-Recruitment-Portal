@@ -8,6 +8,7 @@ import json
 from datetime import datetime
 import pymongo
 import bcrypt
+import waitress
 
 
 dotenv.load_dotenv()
@@ -274,6 +275,12 @@ def change_password():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+def run_test_server():
+    app.run(host='0.0.0.0', port=8080, debug=True)
+
+def run_production_server():
+    waitress.serve(app, host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=8080, debug=True)
