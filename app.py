@@ -1,6 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import os
 import dotenv
@@ -9,6 +9,9 @@ from datetime import datetime
 import pymongo
 import bcrypt
 import waitress
+import logging
+
+logging.basicConfig(level=logging.INFO)
 
 
 dotenv.load_dotenv()
@@ -54,6 +57,28 @@ def load_user(reg_no):
         return User(user['reg_no'], user['name'], user['email'], user['status'], user['admin'])
     return None
 
+def is_private_ip(ip):
+    private_ip_ranges = [
+        '10.',        # 10.0.0.0/8
+        '172.',       # We'll filter out only the 172.16.0.0 - 172.31.255.255 range below
+        '192.168.'    # 192.168.0.0/16
+    ]
+
+    for private_range in private_ip_ranges:
+        if ip.startswith(private_range):
+            # Special handling for 172. range (only block 172.16.0.0 - 172.31.255.255)
+            if private_range == '172.' and not (16 <= int(ip.split('.')[1]) <= 31):
+                continue
+            return True
+    return False
+
+@app.before_request
+def before_request():
+    client_ip = request.remote_addr
+    if is_private_ip(client_ip):
+        print(f"Blocked access from private IP: {client_ip}")
+        abort(403)
+
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -82,12 +107,7 @@ def apply():
         acknowledge = request.form.get('acknowledge')
         password = request.form.get('password')
 
-        # Validation checks
-        if reg_no and not reg_no.isdigit():
-            flash('Invalid registration number', 'error')
-            return redirect(url_for('index'))
-        
-        if reg_no and len(reg_no) != 8:
+        if reg_no and not reg_no.isdigit() and len(reg_no) != 8:
             flash('Invalid registration number', 'error')
             return redirect(url_for('index'))
 
@@ -123,7 +143,9 @@ def apply():
                     flash('Application already submitted with this registration number', 'error')
                     return redirect(url_for('index'))
             except Exception as e:
+                logging.error(f'Error checking if application exists: {e}')
                 flash(f'Error submitting the form: {e}', 'error')
+                return redirect(url_for('index'))
             try:
                 hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
                 db.applications.insert_one({
@@ -178,20 +200,25 @@ def login():
         try:
             user = db.applications.find_one({'reg_no': str(reg_no)})
             if not user:
-                flash('Invalid credentials', 'error')
+                flash(f"User with registration number {reg_no} not found", 'error')
                 return redirect(url_for('login'))
 
             if bcrypt.checkpw(password.encode('utf-8'), user['password']):
                 user_obj = User(user['reg_no'], user['name'], user['email'], user['status'], user.get('admin', False))
                 login_user(user_obj)
+                if str(reg_no) == str(password):
+                    flash('First time login detected. Please change your password', 'warning')
+                    return redirect(url_for('change_password'))
+
                 flash('Login successful!', 'success')
                 return redirect(url_for('dashboard'))
             else:
-                flash('Invalid credentials', 'error')
+                flash(f"Invalid password for registration number {reg_no}", 'error')
                 return redirect(url_for('login'))
 
         except Exception as e:
             flash(f'Error logging in: {e}', 'error')
+            logging.error(f'Error logging in: {e}')
             return redirect(url_for('login'))
     else:
         if current_user.is_authenticated:
@@ -233,6 +260,8 @@ def add_user():
             })
         except Exception as e:
             flash(f'Error adding user: {e}', 'error')
+            return redirect(url_for('add_user'))
+        logging.info(f'User {name} added successfully by {current_user.name}')
         return redirect(url_for('dashboard'))
 
     return render_template('add_user.html')
@@ -300,10 +329,27 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
+@app.errorhandler(404)
+def page_not_found(e):
+    flash("Looks like you're lost. The page you're looking for was not found", 'error')
+    return redirect(url_for('index'))
+
+@app.errorhandler(500)
+def internal_server_error(e):
+    flash("Oops! Something went wrong. Please try again later", 'error')
+    logging.error(f'Internal Server Error: {e}')
+    return redirect(url_for('index'))
+
+@app.errorhandler(403)
+def forbidden(e):
+    return render_template('403.html'), 403
+
 def run_test_server():
+    logging.info("Running Test Flask Server")
     app.run(host='0.0.0.0', port=8080, debug=True)
 
 def run_production_server():
+    logging.info("Running Production Server")
     waitress.serve(app, host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':
