@@ -263,6 +263,37 @@ def change_password():
         return redirect(url_for('change_password'))
     return render_template('change_password.html')
 
+@app.route('/application/<reg_no>', methods=['GET', 'POST'])
+@login_required
+def view_application(reg_no):
+    if not current_user.admin:
+        flash('You do not have permission to view this page', 'error')
+        return redirect(url_for('dashboard'))
+
+    application = db.applications.find_one({'reg_no': reg_no})
+    if not application:
+        flash('Application not found', 'error')
+        return redirect(url_for('dashboard'))
+
+    if request.method == 'POST':
+        new_status = request.form.get('status')
+        if new_status not in ['Approved', 'Declined']:
+            flash('Invalid status update', 'error')
+            return redirect(url_for('view_application', reg_no=reg_no))
+        db.applications.update_one(
+            {'reg_no': reg_no},
+            {
+                '$set': {
+                    'status': new_status,
+                    'reviewed_by': current_user.name
+                }
+            }
+        )
+        flash('Application status updated successfully!', 'success')
+        return redirect(url_for('view_application', reg_no=reg_no))
+
+    return render_template('view_application.html', application=application)
+
 @app.route('/logout')
 @login_required
 def logout():

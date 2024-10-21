@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %} View Application - {{ application.name }} {% endblock %}
+
+{% block content %}
+    <h4>Application Details for {{ application.name | default('Not Available') }}</h4>
+
+    <p><strong>Email:</strong> {{ application.email | default('Not Available') }}</p>
+    <p><strong>Gender:</strong> {{ application.gender | default('Not Available') }}</p>
+    <p><strong>Registration Number:</strong> {{ application.reg_no | default('Not Available') }}</p>
+    <p><strong>Mobile Number:</strong> {{ application.mobile_no | default('Not Available') }}</p>
+    <p><strong>Stream:</strong> {{ application.stream | default('Not Available') }}</p>
+    <p><strong>Year of Study:</strong> {{ application.year_of_study | default('Not Available') }}</p>
+    <p><strong>Role Applied:</strong> {{ application.role_applied | default('Not Available') }}</p>
+    <p><strong>Expertise In Applied Role:</strong> {{ application.rate_yourself | default('Not Available') }}</p>
+    <p><strong>Other Organizations:</strong> {{ application.other_organization | default('Not Available') }}</p>
+    <p><strong>Experience in Other Organizations:</strong> {{ application.experience | default('Not Available') }}</p>
+    <p><strong>Time they can dedicate each week (out of 5):</strong> {{ application.dedication | default('Not Available') }}</p>
+    <p><strong>Why Interested:</strong> {{ application.why_interested | default('Not Available') }}</p>
+    <p><strong>How will they contribute to the club:</strong> {{ application.contribution | default('Not Available') }}</p>
+    <p><strong>How did they know about the club:</strong> {{ application.how_did_you_know | default('Not Available') }}</p>
+    <p><strong>AWS Educate Account:</strong> {{ application.aws_account | default('Not Available') }}</p>
+    <p><strong>External Links: </strong> {{ application.links | default('Not Available') }}</p>
+    <p><strong>Used AWS Before:</strong> {{ application.used_aws }}</p>
+
+    <form method="POST">
+        <div class="form-group">
+            <label for="status">Change Application Status:</label>
+            <select class="form-control" id="status" name="status">
+                <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
+                <option value="Approved" {% if application.status == 'Approved' %}selected{% endif %}>Approved</option>
+                <option value="Declined" {% if application.status == 'Declined' %}selected{% endif %}>Declined</option>
+            </select>
+        </div>
+        <button type="submit" class="btn btn-primary">Save Changes</button>
+    </form>
+{% endblock %}
