@@ -9,6 +9,7 @@ from datetime import datetime
 import pymongo
 import bcrypt
 import waitress
+import ipaddress
 import logging
 
 logging.basicConfig(level=logging.INFO)
@@ -57,26 +58,18 @@ def load_user(reg_no):
         return User(user['reg_no'], user['name'], user['email'], user['status'], user['admin'])
     return None
 
-def is_private_ip(ip):
-    private_ip_ranges = [
-        '10.',        # 10.0.0.0/8
-        '172.',       # We'll filter out only the 172.16.0.0 - 172.31.255.255 range below
-        '192.168.'    # 192.168.0.0/16
-    ]
+class_d_range = ipaddress.IPv4Network('224.0.0.0/4')  # Class D (Multicast)
+class_e_range = ipaddress.IPv4Network('240.0.0.0/4')  # Class E (Experimental)
 
-    for private_range in private_ip_ranges:
-        if ip.startswith(private_range):
-            # Special handling for 172. range (only block 172.16.0.0 - 172.31.255.255)
-            if private_range == '172.' and not (16 <= int(ip.split('.')[1]) <= 31):
-                continue
-            return True
-    return False
+def is_class_d_or_e(ip):
+    ip_addr = ipaddress.IPv4Address(ip)
+    return ip_addr in class_d_range or ip_addr in class_e_range
 
 @app.before_request
 def before_request():
     client_ip = request.remote_addr
-    if is_private_ip(client_ip):
-        print(f"Blocked access from private IP: {client_ip}")
+    if is_class_d_or_e(client_ip):
+        print(f"Blocked access from Class D or E IP: {client_ip}")
         abort(403)
 
 @app.route('/')
