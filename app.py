@@ -1,6 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort, g
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import os
 import dotenv
@@ -11,6 +11,8 @@ import bcrypt
 import waitress
 import ipaddress
 import logging
+import secrets
+import time
 
 logging.basicConfig(level=logging.INFO)
 
@@ -50,6 +52,28 @@ class User(UserMixin):
     
     def get_id(self):
         return str(self.reg_no)
+
+current_login_url = None
+last_url_generated_time = 0 
+
+def generate_new_login_url():
+    """
+    Generate a new random URL for login.
+    """
+    return '/login/' + secrets.token_urlsafe(8)
+
+@app.before_request
+def ensure_login_url():
+    """
+    Before each request, ensure that we have a valid login URL available.
+    Generate a new one if 5 seconds have passed since the last generation.
+    """
+    global current_login_url, last_url_generated_time
+    current_time = time.time()
+    if current_login_url is None or current_time - last_url_generated_time > 5:
+        current_login_url = generate_new_login_url()
+        last_url_generated_time = current_time
+    g.current_login_url = current_login_url
 
 @login_manager.user_loader
 def load_user(reg_no):
@@ -180,21 +204,26 @@ def apply():
         else:
             return render_template('apply.html')
 
-@app.route('/login', methods=['GET', 'POST'])
-def login():
+@app.route('/login/<path>', methods=['GET', 'POST'])
+def login(path):
+    global current_login_url
+    if f'login/{path}' != current_login_url.strip('/'):
+        flash('Invalid login URL.', 'error')
+        return redirect(url_for('index'))
+
     if request.method == 'POST':
         reg_no = request.form.get('reg_no')
         password = request.form.get('password')
 
         if not reg_no or not password:
             flash('All fields are required', 'error')
-            return redirect(url_for('login'))
+            return redirect(current_login_url)
 
         try:
             user = db.applications.find_one({'reg_no': str(reg_no)})
             if not user:
                 flash(f"User with registration number {reg_no} not found", 'error')
-                return redirect(url_for('login'))
+                return redirect(current_login_url)
 
             if bcrypt.checkpw(password.encode('utf-8'), user['password']):
                 user_obj = User(user['reg_no'], user['name'], user['email'], user['status'], user.get('admin', False))
@@ -204,15 +233,16 @@ def login():
                     return redirect(url_for('change_password'))
 
                 flash('Login successful!', 'success')
+                current_login_url = generate_new_login_url()
                 return redirect(url_for('dashboard'))
             else:
                 flash(f"Invalid password for registration number {reg_no}", 'error')
-                return redirect(url_for('login'))
+                return redirect(current_login_url)
 
         except Exception as e:
             flash(f'Error logging in: {e}', 'error')
             logging.error(f'Error logging in: {e}')
-            return redirect(url_for('login'))
+            return redirect(current_login_url)
     else:
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
