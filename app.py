@@ -58,7 +58,8 @@ last_url_generated_time = 0
 
 def generate_new_login_url():
     """
-    Generate a new random URL for login.
+    This function generates a new login URL.
+    :return: str
     """
     return '/login/' + secrets.token_urlsafe(8)
 
@@ -66,11 +67,12 @@ def generate_new_login_url():
 def ensure_login_url():
     """
     Before each request, ensure that we have a valid login URL available.
-    Generate a new one if 5 seconds have passed since the last generation.
+    Generate a new one if 15 seconds have passed since the last generation.
+    :return: None
     """
     global current_login_url, last_url_generated_time
     current_time = time.time()
-    if current_login_url is None or current_time - last_url_generated_time > 5:
+    if current_login_url is None or current_time - last_url_generated_time > 15:
         current_login_url = generate_new_login_url()
         last_url_generated_time = current_time
     g.current_login_url = current_login_url
@@ -93,7 +95,7 @@ def is_class_d_or_e(ip):
 def before_request():
     client_ip = request.remote_addr
     if is_class_d_or_e(client_ip):
-        print(f"Blocked access from Class D or E IP: {client_ip}")
+        logging.warning(f'Blocking request from IP {client_ip}')
         abort(403)
 
 @app.route('/')
@@ -365,6 +367,9 @@ def internal_server_error(e):
 
 @app.errorhandler(403)
 def forbidden(e):
+    """
+    Handle 403 Forbidden errors.
+    """
     return render_template('403.html'), 403
 
 def run_test_server():
