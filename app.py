@@ -219,8 +219,8 @@ def apply():
             return render_template('apply.html')
 
 @app.route('/login/<path>', methods=['GET', 'POST'])
-def login(path):
-    if not path:
+def login(path = "None"):
+    if path == 'None':
         flash('Looks like you need to login again', 'error')
         return redirect(url_for('index'))
     global current_login_url
