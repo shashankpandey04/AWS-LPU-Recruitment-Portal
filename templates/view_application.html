@@ -22,6 +22,11 @@
     <p><strong>AWS Educate Account:</strong> {{ application.aws_account | default('Not Available') }}</p>
     <p><strong>External Links: </strong> {{ application.links | default('Not Available') }}</p>
     <p><strong>Used AWS Before:</strong> {{ application.used_aws }}</p>
+    {% if application.cv_id %}
+        <p><strong>CV:</strong> <a href="{{ url_for('download_cv', cv_id=application.cv_id) }}">Download CV</a></p>
+    {% else %}
+        <p><strong>CV:</strong> CV not uploaded</p>
+    {% endif %}
 
     <form method="POST">
         <div class="form-group">
