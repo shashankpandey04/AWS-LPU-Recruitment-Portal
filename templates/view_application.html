@@ -25,7 +25,7 @@
     {% if application.cv_id %}
         <p><strong>CV:</strong> <a href="{{ url_for('download_cv', cv_id=application.cv_id) }}">Download CV</a></p>
     {% else %}
-        <p><strong>CV:</strong> CV not uploaded</p>
+        <p><strong>CV:</strong>Not uploaded</p>
     {% endif %}
 
     <form method="POST">
