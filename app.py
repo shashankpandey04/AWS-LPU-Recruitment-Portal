@@ -267,8 +267,10 @@ def login(path = "None"):
             return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET'])
-@login_required
 def dashboard():
+    if not current_user.is_authenticated:
+        flash('You need to login to view this page', 'error')
+        return redirect(url_for('login', path=current_login_url.strip('/')))
     if current_user.admin:
         applications = list(db.applications.find())
         applications = [app for app in applications if app['admin'] == False]
