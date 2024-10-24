@@ -6,7 +6,7 @@
 {% block content %}
         <div class="form-container">
             <h2 class="text-center">Join AWS Cloud Club LPU</h2>
-            <form method="POST" action="{{ url_for('apply') }}">
+            <form method="POST" action="{{ url_for('apply') }}" enctype="multipart/form-data">
 
                 <div class="form-group">
                     <label for="name">Full Name</label>
@@ -150,8 +150,13 @@
                     <input type="password" class="form-control" id="password" name="password" required>
                 </div>
 
+                <div class="form-group">
+                    <label for="cv">Upload CV</label>
+                    <input type="file" class="form-control" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
+                </div>
+
                 <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="acknowledge" name="acknowledge" required>
+                    <input class="form-check-input" type="checkbox" id="acknowledge" name="acknowledge" required style="background-color: #fff;">
                     <label class="form-check-label" for="acknowledge">I acknowledge that the information provided is accurate and true.</label>
                 </div>
 

@@ -1,6 +1,6 @@
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
-from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort, g
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, session, abort, g, send_file, Response
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 import os
 import dotenv
@@ -13,6 +13,9 @@ import ipaddress
 import logging
 import secrets
 import time
+import gridfs
+from werkzeug.utils import secure_filename
+from bson.objectid import ObjectId
 
 logging.basicConfig(level=logging.INFO)
 
@@ -37,18 +40,20 @@ app.secret_key = SECRET_KEY
 MONGO_URI = os.getenv('MONGO_URI')
 client = pymongo.MongoClient(MONGO_URI)
 db = client['aws_application']
+fs = gridfs.GridFS(db)
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
 
 class User(UserMixin):
-    def __init__(self, reg_no, name, email, status, admin):
+    def __init__(self, reg_no, name, email, status, admin, cv_id=None):
         self.reg_no = reg_no
         self.name = name
         self.email = email
         self.status = status
         self.admin = admin
+        self.cv_id = cv_id
     
     def get_id(self):
         return str(self.reg_no)
@@ -81,7 +86,7 @@ def ensure_login_url():
 def load_user(reg_no):
     user = db.applications.find_one({'reg_no': reg_no})
     if user:
-        return User(user['reg_no'], user['name'], user['email'], user['status'], user['admin'])
+        return User(user['reg_no'], user['name'], user['email'], user['status'], user['admin'], user.get('cv_id', None))
     return None
 
 class_d_range = ipaddress.IPv4Network('224.0.0.0/4')  # Class D (Multicast)
@@ -125,6 +130,12 @@ def apply():
         used_aws = request.form.get('used_aws')
         acknowledge = request.form.get('acknowledge')
         password = request.form.get('password')
+        cv = request.files['cv']
+
+        if cv and cv.filename!='':
+            filename = secure_filename(cv.filename)
+            cv_id = fs.put(cv.read(), filename=filename) 
+            
 
         if reg_no and not reg_no.isdigit() and len(reg_no) != 8:
             flash('Invalid registration number', 'error')
@@ -187,6 +198,7 @@ def apply():
                     'aws_account': aws_account,
                     'used_aws': used_aws,
                     'acknowledge': acknowledge,
+                    'cv_id': cv_id,
                     'status': 'Pending',
                     'submitted_at': datetime.now(),
                     'reviewed_by': None,
@@ -228,7 +240,7 @@ def login(path):
                 return redirect(current_login_url)
 
             if bcrypt.checkpw(password.encode('utf-8'), user['password']):
-                user_obj = User(user['reg_no'], user['name'], user['email'], user['status'], user.get('admin', False))
+                user_obj = User(user['reg_no'], user['name'], user['email'], user['status'], user.get('admin', False), user.get('cv_id', None))
                 login_user(user_obj)
                 if str(reg_no) == str(password):
                     flash('First time login detected. Please change your password', 'warning')
@@ -281,7 +293,8 @@ def add_user():
                 'password': hashed_password,
                 'admin': True,
                 'email': "None",
-                'status': 'Admin'
+                'status': 'Admin',
+                'cv_id': None,
             })
         except Exception as e:
             flash(f'Error adding user: {e}', 'error')
@@ -364,6 +377,42 @@ def internal_server_error(e):
     flash("Oops! Something went wrong. Please try again later", 'error')
     logging.error(f'Internal Server Error: {e}')
     return redirect(url_for('index'))
+
+@app.route('/cv/download/<cv_id>')
+@login_required
+def download_cv(cv_id):
+    try:
+        file_id = ObjectId(cv_id)
+        file = fs.get(file_id)
+        response = Response(file.read(), mimetype='application/octet-stream')
+        response.headers['Content-Disposition'] = f'attachment; filename="{file.filename}"'
+        return response
+    except gridfs.errors.NoFile:
+        flash('CV not found', 'error')
+        return redirect(url_for('dashboard'))
+    except Exception as e:
+        flash(f'Error: {str(e)}', 'error')
+        return redirect(url_for('dashboard'))
+    
+@app.route('/cv/upload', methods=['POST'])
+@login_required
+def upload_cv():
+    if 'cv' not in request.files or request.files['cv'].filename == '':
+        flash('No file selected', 'error')
+        return redirect(url_for('index'))
+    cv = request.files['cv']
+    if cv and cv.filename != '':
+        filename = secure_filename(cv.filename)
+        cv_id = fs.put(cv.read(), filename=filename)
+        db.applications.update_one(
+            {'reg_no': current_user.reg_no},
+            {'$set': {'cv_id': cv_id}}
+        )
+        flash('CV uploaded successfully', 'success')
+        return redirect(url_for('dashboard'))
+    else:
+        flash('Failed to upload CV', 'error')
+        return redirect(url_for('dashboard'))
 
 @app.errorhandler(403)
 def forbidden(e):

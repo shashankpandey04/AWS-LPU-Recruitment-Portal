@@ -28,5 +28,18 @@
                 <td>{{ application.status }}</td>
             </tr>
         </table>
+
+        {% if application.cv_id %}
+            <h4>Your CV</h4>
+            <a href="{{ url_for('download_cv', cv_id=application.cv_id) }}" class="btn btn-primary">Download CV</a>
+        {% else %}
+            <h4>Upload CV</h4>
+            <form method="POST" action="{{ url_for('upload_cv') }}" enctype="multipart/form-data">
+                <div class="form-group">
+                    <input type="file" name="cv" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Upload CV</button>
+            </form>
+        {% endif %}
     
 {% endblock %}
