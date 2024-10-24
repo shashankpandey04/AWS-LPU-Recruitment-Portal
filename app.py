@@ -220,6 +220,9 @@ def apply():
 
 @app.route('/login/<path>', methods=['GET', 'POST'])
 def login(path):
+    if not path:
+        flash('Looks like you need to login again', 'error')
+        return redirect(url_for('index'))
     global current_login_url
     if f'login/{path}' != current_login_url.strip('/'):
         flash('Invalid login URL.', 'error')
