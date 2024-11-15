@@ -12,6 +12,7 @@ import waitress
 import ipaddress
 import logging
 import secrets
+import requests
 import time
 import gridfs
 from werkzeug.utils import secure_filename
@@ -36,6 +37,8 @@ sheet = spreadsheet.worksheet('Sheet1')
 SECRET_KEY = os.getenv('SECRET_KEY')
 app = Flask(__name__)
 app.secret_key = SECRET_KEY
+
+RECAPTCHA_SECRET = os.getenv('RECAPTCHA_SECRET')
 
 MONGO_URI = os.getenv('MONGO_URI')
 client = pymongo.MongoClient(MONGO_URI)
@@ -131,6 +134,24 @@ def apply():
         acknowledge = request.form.get('acknowledge')
         password = request.form.get('password')
         cv = request.files['cv']
+
+        recaptcha_response = request.form.get('g-recaptcha-response')
+        if not recaptcha_response:
+            flash('Please complete the reCAPTCHA.', 'error')
+            return redirect(url_for('index'))
+
+        verify_url = 'https://www.google.com/recaptcha/api/siteverify'
+        payload = {'secret': RECAPTCHA_SECRET, 'response': recaptcha_response}
+        try:
+            recaptcha_verification = requests.post(verify_url, data=payload)
+            recaptcha_result = recaptcha_verification.json()
+            if not recaptcha_result.get('success'):
+                flash('reCAPTCHA verification failed. Please try again.', 'error')
+                return redirect(url_for('index'))
+        except Exception as e:
+            logging.error(f'Error verifying reCAPTCHA: {e}')
+            flash('Error verifying reCAPTCHA. Please try again later.', 'error')
+            return redirect(url_for('index'))
 
         if cv and cv.filename!='':
             filename = secure_filename(cv.filename)
