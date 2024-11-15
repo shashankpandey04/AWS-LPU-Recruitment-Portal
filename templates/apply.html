@@ -6,7 +6,7 @@
 {% block content %}
         <div class="form-container">
             <h2 class="text-center">Join AWS Cloud Club LPU</h2>
-            <form method="POST" action="{{ url_for('apply') }}" enctype="multipart/form-data">
+            <form method="POST" action="{{ url_for('apply') }}" enctype="multipart/form-data" id="myForm">
 
                 <div class="form-group">
                     <label for="name">Full Name</label>
@@ -159,8 +159,19 @@
                     <input class="form-check-input" type="checkbox" id="acknowledge" name="acknowledge" required style="background-color: #fff;">
                     <label class="form-check-label" for="acknowledge">I acknowledge that the information provided is accurate and true.</label>
                 </div>
-                <div class="g-recaptcha" data-sitekey="6LcU5H8qAAAAANLuynsoe6SxsTA0FqHBziJpZvXX"></div>
+                <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
                 <button type="submit" class="btn btn-primary mt-4">Submit Application</button>
             </form>
         </div>
+        <script>
+            document.getElementById('myForm').addEventListener('submit', function (event) {
+                event.preventDefault()
+                grecaptcha.ready(function () {
+                    grecaptcha.execute('6LcU5H8qAAAAANLuynsoe6SxsTA0FqHBziJpZvXX', { action: 'submit' }).then(function (token) {
+                        document.getElementById('g-recaptcha-response').value = token;
+                        document.getElementById('myForm').submit();
+                    });
+                });
+            });
+        </script>
 {% endblock %}
