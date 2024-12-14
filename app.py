@@ -64,27 +64,6 @@ class User(UserMixin):
 current_login_url = None
 last_url_generated_time = 0 
 
-def generate_new_login_url():
-    """
-    This function generates a new login URL.
-    :return: str
-    """
-    return '/login/' + secrets.token_urlsafe(8)
-
-@app.before_request
-def ensure_login_url():
-    """
-    Before each request, ensure that we have a valid login URL available.
-    Generate a new one if 15 seconds have passed since the last generation.
-    :return: None
-    """
-    global current_login_url, last_url_generated_time
-    current_time = time.time()
-    if current_login_url is None or current_time - last_url_generated_time > 15:
-        current_login_url = generate_new_login_url()
-        last_url_generated_time = current_time
-    g.current_login_url = current_login_url
-
 @login_manager.user_loader
 def load_user(reg_no):
     user = db.applications.find_one({'reg_no': reg_no})
@@ -239,16 +218,8 @@ def apply():
         else:
             return render_template('apply.html')
 
-@app.route('/login/<path>', methods=['GET', 'POST'])
-def login(path = "None"):
-    if path == 'None':
-        flash('Looks like you need to login again', 'error')
-        return redirect(url_for('index'))
-    global current_login_url
-    if f'login/{path}' != current_login_url.strip('/'):
-        flash('Invalid login URL.', 'error')
-        return redirect(url_for('index'))
-
+@app.route('/login', methods=['GET', 'POST'])
+def login():
     if request.method == 'POST':
         reg_no = request.form.get('reg_no')
         password = request.form.get('password')
@@ -271,7 +242,6 @@ def login(path = "None"):
                     return redirect(url_for('change_password'))
 
                 flash('Login successful!', 'success')
-                current_login_url = generate_new_login_url()
                 return redirect(url_for('dashboard'))
             else:
                 flash(f"Invalid password for registration number {reg_no}", 'error')
@@ -456,4 +426,4 @@ def run_production_server():
     waitress.serve(app, host='0.0.0.0', port=8080)
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
