@@ -6,7 +6,7 @@
 {% block content %}
 
 <h2 class="text-center">Login to AWS Cloud Club</h2>
-<form method="POST" action="{{ g.current_login_url }}">
+<form method="POST" action="{{ url_for('login') }}">
     <div class="form-group">
         <label for="reg_no">Registration Number</label>
         <input type="text" class="form-control" id="reg_no" name="reg_no" required>

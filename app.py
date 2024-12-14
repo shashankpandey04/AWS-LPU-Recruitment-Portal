@@ -61,9 +61,6 @@ class User(UserMixin):
     def get_id(self):
         return str(self.reg_no)
 
-current_login_url = None
-last_url_generated_time = 0 
-
 @login_manager.user_loader
 def load_user(reg_no):
     user = db.applications.find_one({'reg_no': reg_no})
@@ -226,13 +223,13 @@ def login():
 
         if not reg_no or not password:
             flash('All fields are required', 'error')
-            return redirect(current_login_url)
+            return redirect(url_for('login'))
 
         try:
             user = db.applications.find_one({'reg_no': str(reg_no)})
             if not user:
                 flash(f"User with registration number {reg_no} not found", 'error')
-                return redirect(current_login_url)
+                return redirect(url_for('login'))
 
             if bcrypt.checkpw(password.encode('utf-8'), user['password']):
                 user_obj = User(user['reg_no'], user['name'], user['email'], user['status'], user.get('admin', False), user.get('cv_id', None))
@@ -245,12 +242,13 @@ def login():
                 return redirect(url_for('dashboard'))
             else:
                 flash(f"Invalid password for registration number {reg_no}", 'error')
-                return redirect(current_login_url)
+                return redirect(url_for('login'))
 
         except Exception as e:
             flash(f'Error logging in: {e}', 'error')
             logging.error(f'Error logging in: {e}')
-            return redirect(current_login_url)
+            return redirect(url_for('login'))
+
     else:
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
@@ -261,7 +259,7 @@ def login():
 def dashboard():
     if not current_user.is_authenticated:
         flash('You need to login to view this page', 'error')
-        return redirect(url_for('login', path=current_login_url.strip('/')))
+        return redirect(url_for('login'))
     if current_user.admin:
         applications = list(db.applications.find())
         applications = [app for app in applications if app['admin'] == False]
