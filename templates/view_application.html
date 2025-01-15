@@ -1,42 +1,170 @@
-{% extends 'base.html' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>View Application - {{ application.name }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="icon" href="{{ url_for('static', filename='images/aws.png') }}">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1f1c2c, #928dab);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+        }
 
-{% block title %} View Application - {{ application.name }} {% endblock %}
+        .glass-card {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 2rem;
+            animation: fadeIn 1s ease-in-out;
+        }
 
-{% block content %}
-    <h4>Application Details for {{ application.name | default('Not Available') }}</h4>
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    <p><strong>Email:</strong> {{ application.email | default('Not Available') }}</p>
-    <p><strong>Gender:</strong> {{ application.gender | default('Not Available') }}</p>
-    <p><strong>Registration Number:</strong> {{ application.reg_no | default('Not Available') }}</p>
-    <p><strong>Mobile Number:</strong> {{ application.mobile_no | default('Not Available') }}</p>
-    <p><strong>Stream:</strong> {{ application.stream | default('Not Available') }}</p>
-    <p><strong>Year of Study:</strong> {{ application.year_of_study | default('Not Available') }}</p>
-    <p><strong>Role Applied:</strong> {{ application.role_applied | default('Not Available') }}</p>
-    <p><strong>Expertise In Applied Role:</strong> {{ application.rate_yourself | default('Not Available') }}</p>
-    <p><strong>Other Organizations:</strong> {{ application.other_organization | default('Not Available') }}</p>
-    <p><strong>Experience in Other Organizations:</strong> {{ application.experience | default('Not Available') }}</p>
-    <p><strong>Time they can dedicate each week (out of 5):</strong> {{ application.dedication | default('Not Available') }}</p>
-    <p><strong>Why Interested:</strong> {{ application.why_interested | default('Not Available') }}</p>
-    <p><strong>How will they contribute to the club:</strong> {{ application.contribution | default('Not Available') }}</p>
-    <p><strong>How did they know about the club:</strong> {{ application.how_did_you_know | default('Not Available') }}</p>
-    <p><strong>AWS Educate Account:</strong> {{ application.aws_account | default('Not Available') }}</p>
-    <p><strong>External Links: </strong> {{ application.links | default('Not Available') }}</p>
-    <p><strong>Used AWS Before:</strong> {{ application.used_aws }}</p>
-    {% if application.cv_id %}
-        <p><strong>CV:</strong> <a href="{{ url_for('download_cv', cv_id=application.cv_id) }}">Download CV</a></p>
-    {% else %}
-        <p><strong>CV:</strong>Not uploaded</p>
-    {% endif %}
+        .navbar {
+            position: relative; /* Ensure it overlaps properly */
+            backdrop-filter: blur(10px); /* Optional: Adds a blur effect behind the navbar */
+        }
 
-    <form method="POST">
-        <div class="form-group">
-            <label for="status">Change Application Status:</label>
-            <select class="form-control" id="status" name="status">
-                <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
-                <option value="Approved" {% if application.status == 'Approved' %}selected{% endif %}>Approved</option>
-                <option value="Declined" {% if application.status == 'Declined' %}selected{% endif %}>Declined</option>
-            </select>
+        .navbar-brand img {
+            height: 40px; /* Adjust logo size */
+        }
+
+        .navbar-nav .nav-link {
+            color: white !important; /* Ensures links are white */
+            font-weight: bold; /* Optional: makes the links stand out */
+        }
+        .flashes {
+            list-style: none;
+            padding: 0;
+            position: fixed;
+            top: 0;
+            right: 0;
+            z-index: 1000;
+        }
+        .flashes li {
+            margin: 10px;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .flashes .error {
+            background-color: #f44336;
+            color: white;
+        }
+        .flashes .info {
+            background-color: #2196F3;
+            color: white;
+        }
+        .flashes .success {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .flashes .warning {
+            background-color: #ff9800;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand" href="#">
+            <img src="{{ url_for('static', filename='images/aws.png') }}" alt="AWS Cloud Club LPU" height="40">
+        </a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item"><a class="nav-link" href="/">Home</a></li>
+                {% if current_user.is_authenticated %}
+                <li class="nav-item"><a class="nav-link" href="/dashboard">Dashboard</a></li>
+                <li class="nav-item"><a class="nav-link" href="/change/password">Change Password</a></li>
+                <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                {% else %}
+                <li class="nav-item"><a class="nav-link" href="/apply">Join AWS</a></li>
+                <li class="nav-item"><a class="nav-link" href="/login">Login</a></li>
+                {% endif %}
+            </ul>
         </div>
-        <button type="submit" class="btn btn-primary">Save Changes</button>
-    </form>
-{% endblock %}
+    </div>
+</nav>
+
+<!--Flash Message-->
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for category, message in messages %}
+        <li class="{{ category }}">{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+{% endwith %}
+
+<div class="container d-flex justify-content-center align-items-center mt-5">
+    <div class="glass-card col-md-8">
+        <h4>Application Details for {{ application.name | default('Not Available') }}</h4>
+
+        <p><strong>Email:</strong> {{ application.email | default('Not Available') }}</p>
+        <p><strong>Gender:</strong> {{ application.gender | default('Not Available') }}</p>
+        <p><strong>Registration Number:</strong> {{ application.reg_no | default('Not Available') }}</p>
+        <p><strong>Mobile Number:</strong> {{ application.mobile_no | default('Not Available') }}</p>
+        <p><strong>Stream:</strong> {{ application.stream | default('Not Available') }}</p>
+        <p><strong>Year of Study:</strong> {{ application.year_of_study | default('Not Available') }}</p>
+        <p><strong>Role Applied:</strong> {{ application.role_applied | default('Not Available') }}</p>
+        <p><strong>Expertise In Applied Role:</strong> {{ application.rate_yourself | default('Not Available') }}</p>
+        <p><strong>Other Organizations:</strong> {{ application.other_organization | default('Not Available') }}</p>
+        <p><strong>Experience in Other Organizations:</strong> {{ application.experience | default('Not Available') }}</p>
+        <p><strong>Time they can dedicate each week (out of 5):</strong> {{ application.dedication | default('Not Available') }}</p>
+        <p><strong>Why Interested:</strong> {{ application.why_interested | default('Not Available') }}</p>
+        <p><strong>How will they contribute to the club:</strong> {{ application.contribution | default('Not Available') }}</p>
+        <p><strong>How did they know about the club:</strong> {{ application.how_did_you_know | default('Not Available') }}</p>
+        <p><strong>AWS Educate Account:</strong> {{ application.aws_account | default('Not Available') }}</p>
+        <p><strong>External Links: </strong> {{ application.links | default('Not Available') }}</p>
+        <p><strong>Used AWS Before:</strong> {{ application.used_aws }}</p>
+
+        {% if application.cv_id %}
+            <p><strong>CV:</strong> <a href="{{ url_for('download_cv', cv_id=application.cv_id) }}" style="color: rgb(0, 0, 0);">Download CV</a></p>
+        {% else %}
+            <p><strong>CV:</strong>Not uploaded</p>
+        {% endif %}
+
+        <form method="POST">
+            <div class="form-group">
+                <label for="status">Change Application Status:</label>
+                <select class="form-control" id="status" name="status">
+                    <option value="Pending" {% if application.status == 'Pending' %}selected{% endif %}>Pending</option>
+                    <option value="Approved" {% if application.status == 'Approved' %}selected{% endif %}>Approved</option>
+                    <option value="Declined" {% if application.status == 'Declined' %}selected{% endif %}>Declined</option>
+                    <option value="Shortlisted" {% if application.status == 'Shortlisted' %}selected{% endif %}>Shortlisted</option>
+                    <option value="Awaited Result" {% if application.status == 'Awaited Result' %}selected{% endif %}>Awaited Result</option>
+                </select>
+            </div>
+            <br>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </form>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

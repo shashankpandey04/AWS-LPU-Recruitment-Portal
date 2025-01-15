@@ -107,7 +107,6 @@ def apply():
         how_did_you_know = request.form.get('how_did_you_know')
         aws_account = request.form.get('aws_account')
         used_aws = request.form.get('used_aws')
-        acknowledge = request.form.get('acknowledge')
         password = request.form.get('password')
         cv = request.files['cv']
 
@@ -161,7 +160,7 @@ def apply():
         data = [
             email, name, gender, reg_no, mobile_no, stream, year_of_study, 
             role_applied, dedication, rate_yourself, why_interested, other_organization,
-            experience, links, contribution, how_did_you_know, aws_account, used_aws, acknowledge
+            experience, links, contribution, how_did_you_know, aws_account, used_aws
         ]
 
         try:
@@ -194,7 +193,6 @@ def apply():
                     'how_did_you_know': how_did_you_know,
                     'aws_account': aws_account,
                     'used_aws': used_aws,
-                    'acknowledge': acknowledge,
                     'cv_id': cv_id,
                     'status': 'Pending',
                     'submitted_at': datetime.now(),
@@ -217,6 +215,8 @@ def apply():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
+    if request.method == 'GET':
+        return render_template('login.html')
     if request.method == 'POST':
         reg_no = request.form.get('reg_no')
         password = request.form.get('password')
@@ -248,12 +248,6 @@ def login():
             flash(f'Error logging in: {e}', 'error')
             logging.error(f'Error logging in: {e}')
             return redirect(url_for('login'))
-
-    else:
-        if current_user.is_authenticated:
-            return redirect(url_for('dashboard'))
-        else:
-            return render_template('login.html')
 
 @app.route('/dashboard', methods=['GET'])
 def dashboard():
@@ -361,11 +355,6 @@ def logout():
     logout_user()
     return redirect(url_for('index'))
 
-@app.errorhandler(404)
-def page_not_found(e):
-    flash("Looks like you're lost. The page you're looking for was not found", 'error')
-    return redirect(url_for('index'))
-
 @app.errorhandler(500)
 def internal_server_error(e):
     flash("Oops! Something went wrong. Please try again later", 'error')
@@ -417,11 +406,11 @@ def forbidden(e):
 
 def run_test_server():
     logging.info("Running Test Flask Server")
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host='0.0.0.0', port=80, debug=True)
 
 def run_production_server():
     logging.info("Running Production Server")
-    waitress.serve(app, host='0.0.0.0', port=8080)
+    waitress.serve(app, host='0.0.0.0', port=80)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80, debug=True)
