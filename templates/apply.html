@@ -103,152 +103,155 @@
 
 <div class="container d-flex justify-content-center align-items-center mt-5">
     <div class="glass-card col-md-8">
-        <h2 class="text-center mb-4">Join AWS Cloud Club LPU</h2>
         <form method="POST" action="{{ url_for('apply') }}" enctype="multipart/form-data" id="myForm">
+            <fieldset>
+                <legend>
+                    Join AWS Cloud Club LPU
+                </legend>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Full Name</label>
+                    <input type="text" class="form-control" id="name" name="name" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="name" name="name" required>
-            </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
-            </div>
+                <div class="mb-3">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender" name="gender" required>
+                        <option value="">Select Here</option>
+                        <option>Male</option>
+                        <option>Female</option>
+                        <option>Prefer not to say</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="gender" class="form-label">Gender</label>
-                <select class="form-select" id="gender" name="gender" required>
-                    <option value="">Select Here</option>
-                    <option>Male</option>
-                    <option>Female</option>
-                    <option>Prefer not to say</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="reg_no" class="form-label">Registration Number</label>
+                    <input type="text" class="form-control" id="reg_no" name="reg_no" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="reg_no" class="form-label">Registration Number</label>
-                <input type="text" class="form-control" id="reg_no" name="reg_no" required>
-            </div>
+                <div class="mb-3">
+                    <label for="mobile_no" class="form-label">Mobile Number</label>
+                    <input type="tel" class="form-control" id="mobile_no" name="mobile_no" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="mobile_no" class="form-label">Mobile Number</label>
-                <input type="tel" class="form-control" id="mobile_no" name="mobile_no" required>
-            </div>
+                <div class="mb-3">
+                    <label for="stream" class="form-label">Stream (e.g., BTech CSE)</label>
+                    <input type="text" class="form-control" id="stream" name="stream" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="stream" class="form-label">Stream (e.g., BTech CSE)</label>
-                <input type="text" class="form-control" id="stream" name="stream" required>
-            </div>
+                <div class="mb-3">
+                    <label for="year_of_study" class="form-label">Year of Study</label>
+                    <select class="form-select" id="year_of_study" name="year_of_study" required>
+                        <option value="">Select Here</option>
+                        <option>1st Year</option>
+                        <option>2nd Year</option>
+                        <option>3rd Year</option>
+                        <option>4th Year</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="year_of_study" class="form-label">Year of Study</label>
-                <select class="form-select" id="year_of_study" name="year_of_study" required>
-                    <option value="">Select Here</option>
-                    <option>1st Year</option>
-                    <option>2nd Year</option>
-                    <option>3rd Year</option>
-                    <option>4th Year</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="role_applied" class="form-label">Role Applied</label>
+                    <select class="form-select" id="role_applied" name="role_applied" required>
+                        <option value="">Select Here</option>
+                        <option>Web Development</option>
+                        <option>App Development</option>
+                        <option>Cybersecurity</option>
+                        <option>Data Science</option>
+                        <option>Cloud Architect</option>
+                        <option>Public Speaker</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="role_applied" class="form-label">Role Applied</label>
-                <select class="form-select" id="role_applied" name="role_applied" required>
-                    <option value="">Select Here</option>
-                    <option>Web Development</option>
-                    <option>App Development</option>
-                    <option>Cybersecurity</option>
-                    <option>Data Science</option>
-                    <option>Cloud Architect</option>
-                    <option>Public Speaker</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="rate_yourself" class="form-label">Rate your expertise in the chosen role (1-5)</label>
+                    <select class="form-select" id="rate_yourself" name="rate_yourself" required>
+                        <option value="">Select Here</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="rate_yourself" class="form-label">Rate your expertise in the chosen role (1-5)</label>
-                <select class="form-select" id="rate_yourself" name="rate_yourself" required>
-                    <option value="">Select Here</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="other_organization" class="form-label">Associated with any other club or organization?</label>
+                    <input type="text" class="form-control" id="other_organization" name="other_organization" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="other_organization" class="form-label">Associated with any other club or organization?</label>
-                <input type="text" class="form-control" id="other_organization" name="other_organization" required>
-            </div>
+                <div class="mb-3">
+                    <label for="experience" class="form-label">Share your experience and challenges in your role (if any):</label>
+                    <textarea class="form-control" id="experience" name="experience" rows="4"></textarea>
+                </div>
 
-            <div class="mb-3">
-                <label for="experience" class="form-label">Share your experience and challenges in your role (if any):</label>
-                <textarea class="form-control" id="experience" name="experience" rows="4"></textarea>
-            </div>
+                <div class="mb-3">
+                    <label for="dedication" class="form-label">Time you can dedicate (1-5) each week:</label>
+                    <select class="form-select" id="dedication" name="dedication" required>
+                        <option value="">Select Here</option>
+                        <option>1</option>
+                        <option>2</option>
+                        <option>3</option>
+                        <option>4</option>
+                        <option>5</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="dedication" class="form-label">Time you can dedicate (1-5) each week:</label>
-                <select class="form-select" id="dedication" name="dedication" required>
-                    <option value="">Select Here</option>
-                    <option>1</option>
-                    <option>2</option>
-                    <option>3</option>
-                    <option>4</option>
-                    <option>5</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="why_interested" class="form-label">Why are you interested in this role?</label>
+                    <textarea class="form-control" id="why_interested" name="why_interested" rows="4"></textarea>
+                </div>
 
-            <div class="mb-3">
-                <label for="why_interested" class="form-label">Why are you interested in this role?</label>
-                <textarea class="form-control" id="why_interested" name="why_interested" rows="4"></textarea>
-            </div>
+                <div class="mb-3">
+                    <label for="contribution" class="form-label">How will you contribute to the organization?</label>
+                    <textarea class="form-control" id="contribution" name="contribution" rows="4"></textarea>
+                </div>
 
-            <div class="mb-3">
-                <label for="contribution" class="form-label">How will you contribute to the organization?</label>
-                <textarea class="form-control" id="contribution" name="contribution" rows="4"></textarea>
-            </div>
+                <div class="mb-3">
+                    <label for="how_did_you_know" class="form-label">How did you know about this opportunity?</label>
+                    <input type="text" class="form-control" id="how_did_you_know" name="how_did_you_know">
+                </div>
 
-            <div class="mb-3">
-                <label for="how_did_you_know" class="form-label">How did you know about this opportunity?</label>
-                <input type="text" class="form-control" id="how_did_you_know" name="how_did_you_know">
-            </div>
+                <div class="mb-3">
+                    <label for="aws_account" class="form-label">Do you have an AWS Educate or AWS Free Tier account?</label>
+                    <select class="form-select" id="aws_account" name="aws_account">
+                        <option value="">Select Here</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="aws_account" class="form-label">Do you have an AWS Educate or AWS Free Tier account?</label>
-                <select class="form-select" id="aws_account" name="aws_account">
-                    <option value="">Select Here</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="links" class="form-label">External Links (LinkedIn, GitHub, etc.)</label>
+                    <textarea class="form-control" id="links" name="links" rows="4"></textarea>
+                </div>
 
-            <div class="mb-3">
-                <label for="links" class="form-label">External Links (LinkedIn, GitHub, etc.)</label>
-                <textarea class="form-control" id="links" name="links" rows="4"></textarea>
-            </div>
+                <div class="mb-3">
+                    <label for="used_aws" class="form-label">Have you used AWS before?</label>
+                    <select class="form-select" id="used_aws" name="used_aws">
+                        <option value="">Select Here</option>
+                        <option>Yes</option>
+                        <option>No</option>
+                    </select>
+                </div>
 
-            <div class="mb-3">
-                <label for="used_aws" class="form-label">Have you used AWS before?</label>
-                <select class="form-select" id="used_aws" name="used_aws">
-                    <option value="">Select Here</option>
-                    <option>Yes</option>
-                    <option>No</option>
-                </select>
-            </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="password" class="form-label">Password</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
+                <div class="mb-3">
+                    <label for="cv" class="form-label">Upload CV</label>
+                    <input type="file" class="form-control" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
+                </div>
 
-            <div class="mb-3">
-                <label for="cv" class="form-label">Upload CV</label>
-                <input type="file" class="form-control" id="cv" name="cv" accept=".pdf,.doc,.docx" required>
-            </div>
-
-            <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
-            <button type="submit" class="btn btn-primary mt-4">Submit Application</button>
+                <input type="hidden" id="g-recaptcha-response" name="g-recaptcha-response">
+                <button type="submit" class="btn btn-primary mt-4">Submit Application</button>
+            </fieldset>
         </form>
     </div>
 </div>
