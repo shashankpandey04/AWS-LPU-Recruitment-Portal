@@ -404,6 +404,13 @@ def forbidden(e):
     """
     return render_template('403.html'), 403
 
+@app.errorhandler(404)
+def notfound(e):
+    """
+    Handle 404 Forbidden errors.
+    """
+    return redirect(url_for('index'))
+
 def run_test_server():
     logging.info("Running Test Flask Server")
     app.run(host='0.0.0.0', port=80, debug=True)
