@@ -31,6 +31,8 @@ client = gspread.authorize(creds)
 
 SHEET_ID = os.getenv('SHEET_ID')
 
+ACCEPTING_APPLICATIONS = os.getenv('ACCEPTING_APPLICATIONS')
+
 spreadsheet = client.open_by_key(SHEET_ID)
 sheet = spreadsheet.worksheet('Sheet1')
 
@@ -208,6 +210,9 @@ def apply():
             flash(f'Error submitting the form: {e}', 'error')
         return redirect(url_for('index'))
     elif request.method == 'GET':
+        if ACCEPTING_APPLICATIONS == 'False':
+            flash('Applications are closed', 'error')
+            return redirect(url_for('index'))
         if current_user.is_authenticated:
             return redirect(url_for('dashboard'))
         else:
